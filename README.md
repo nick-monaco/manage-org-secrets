@@ -14,7 +14,7 @@ with:
   dependabot: true/false # Not required, for saving dependabot secrets
   secret_name: YOUR_SECRET_NAME
   secret_value: "value to be encoded"
-  selected_repository_ids: "[repo1ID, repo2ID]" # Which repo you want the secret visible to (only for org secrets)
+  selected_repository_ids: "repo1ID, repo2ID" # Which repo you want the secret visible to (only for org secrets)
 ```
 
 ## Example
