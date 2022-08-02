@@ -143,7 +143,7 @@ async function handleSecret({
           secret_name: secretName,
           visibility: "selected",
           selected_repository_ids: selectedRepoIds
-            ? JSON.parse(selectedRepoIds)
+            ? selectedRepoIds.split(",").map((i) => i.trim())
             : null,
         });
     core.info(`< ${status} ${Date.now() - time}ms`);
@@ -161,7 +161,7 @@ async function handleSecret({
           secret_name: secretName,
           visibility: "selected",
           selected_repository_ids: selectedRepoIds
-            ? JSON.parse(selectedRepoIds)
+            ? selectedRepoIds.split(",").map((i) => i.trim())
             : null,
         });
     core.info(`< ${status} ${Date.now() - time}ms`);
