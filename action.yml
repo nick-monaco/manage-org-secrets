@@ -1,0 +1,33 @@
+name: 'Manage Github Secrets'
+description: 'Manage repo, organization, and dependabot secrets'
+branding:
+  icon: git-commit
+  color: blue
+inputs:
+  github_token:
+    description: GitHub token used for creating/updating secret. Must have write admin rights.
+    required: true
+    default: ${{ github.token }}
+  repository:
+    description: Repository name.
+    required: false
+  owner:
+    description: Owner or organization name.
+    required: true
+    default: ${{ github.owner }}
+  dependabot:
+    description: True or false if it's a dependabot secret.
+    required: false
+    default: "false"
+  secret_name:
+    description: Name of the secret to be kept in github secrets.
+    required: true
+  secret_value:
+    description: Value to be saved as a secret.
+    required: true
+  selected_repository_ids:
+    description: Repo ids for org secrets.
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
