@@ -1,4 +1,4 @@
-name: 'Manage Github Secrets'
+name: 'Manage Github Org Secrets'
 description: 'Manage repo, organization, and dependabot secrets'
 branding:
   icon: git-commit
