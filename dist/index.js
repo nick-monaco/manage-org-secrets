@@ -15683,14 +15683,16 @@ async function handleSecret({
     //         secret_name: secretName,
     //         visibility: "selected",
     //         selected_repository_ids: selectedRepoIds
-    //           ? selectedRepoIds.split(",").map((i) => i.trim())
+    //           ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
     //           : null,
     //       });
     //   core.info(`< ${status} ${Date.now() - time}ms`);
     // } else {
     core.info(`${owner}, ${secretName}`);
     core.info(
-      selectedRepoIds ? selectedRepoIds.split(",").map((i) => i.trim()) : null
+      selectedRepoIds
+        ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+        : null
     );
     const { status, data } = repository
       ? await octokit.rest.actions.createOrUpdateRepoSecret({
@@ -15707,7 +15709,7 @@ async function handleSecret({
           key_id: keyId,
           visibility: "selected",
           selected_repository_ids: selectedRepoIds
-            ? selectedRepoIds.split(",").map((i) => i.trim())
+            ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
             : null,
         });
     core.info(data);
