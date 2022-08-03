@@ -15703,6 +15703,8 @@ async function handleSecret({
       : await octokit.actions.createOrUpdateOrgSecret({
           org: owner,
           secret_name: secretName,
+          encrypted_value: encrypted,
+          key_id: keyId,
           visibility: "selected",
           selected_repository_ids: selectedRepoIds
             ? selectedRepoIds.split(",").map((i) => i.trim())
