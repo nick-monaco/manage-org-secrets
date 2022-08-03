@@ -127,7 +127,7 @@ async function handleSecret({
   selectedRepoIds,
   isDependabot,
 }) {
-  core.info("Creating secret");
+  core.info("Updating secret");
   const time = Date.now();
 
   try {
@@ -150,7 +150,7 @@ async function handleSecret({
     //       });
     //   core.info(`< ${status} ${Date.now() - time}ms`);
     // } else {
-    const { status } = repository
+    const res = repository
       ? await octokit.actions.createOrUpdateRepoSecret({
           owner: owner,
           repo: repository,
@@ -166,7 +166,8 @@ async function handleSecret({
             ? selectedRepoIds.split(",").map((i) => i.trim())
             : null,
         });
-    core.info(`< ${status} ${Date.now() - time}ms`);
+    core.info(res);
+    core.info(`< ${res.status} ${Date.now() - time}ms`);
     // }
   } catch (error) {
     core.info(`Error: ${error}`);
