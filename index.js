@@ -60,7 +60,7 @@ async function run() {
 }
 
 async function getDependabotPublicKey(octokit, owner, repository) {
-  core.info("Requesting public key");
+  core.info("Requesting dependabot public key");
   const time = Date.now();
   const { status, data } = repository
     ? await octokit.request(
@@ -129,42 +129,46 @@ async function handleSecret({
   core.info("Creating secret");
   const time = Date.now();
 
-  if (isDependabot) {
-    const { status } = repository
-      ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
-          owner: owner,
-          repo: repository,
-          secret_name: secretName,
-          encrypted_value: encrypted,
-          key_id: keyId,
-        })
-      : await octokit.rest.dependabot.createOrUpdateOrgSecret({
-          org: owner,
-          secret_name: secretName,
-          visibility: "selected",
-          selected_repository_ids: selectedRepoIds
-            ? selectedRepoIds.split(",").map((i) => i.trim())
-            : null,
-        });
-    core.info(`< ${status} ${Date.now() - time}ms`);
-  } else {
-    const { status } = repository
-      ? await octokit.actions.createOrUpdateRepoSecret({
-          owner: owner,
-          repo: repository,
-          secret_name: secretName,
-          encrypted_value: encrypted,
-          key_id: keyId,
-        })
-      : await octokit.actions.createOrUpdateOrgSecret({
-          org: owner,
-          secret_name: secretName,
-          visibility: "selected",
-          selected_repository_ids: selectedRepoIds
-            ? selectedRepoIds.split(",").map((i) => i.trim())
-            : null,
-        });
-    core.info(`< ${status} ${Date.now() - time}ms`);
+  try {
+    if (isDependabot) {
+      const { status } = repository
+        ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
+            owner: owner,
+            repo: repository,
+            secret_name: secretName,
+            encrypted_value: encrypted,
+            key_id: keyId,
+          })
+        : await octokit.rest.dependabot.createOrUpdateOrgSecret({
+            org: owner,
+            secret_name: secretName,
+            visibility: "selected",
+            selected_repository_ids: selectedRepoIds
+              ? selectedRepoIds.split(",").map((i) => i.trim())
+              : null,
+          });
+      core.info(`< ${status} ${Date.now() - time}ms`);
+    } else {
+      const { status } = repository
+        ? await octokit.actions.createOrUpdateRepoSecret({
+            owner: owner,
+            repo: repository,
+            secret_name: secretName,
+            encrypted_value: encrypted,
+            key_id: keyId,
+          })
+        : await octokit.actions.createOrUpdateOrgSecret({
+            org: owner,
+            secret_name: secretName,
+            visibility: "selected",
+            selected_repository_ids: selectedRepoIds
+              ? selectedRepoIds.split(",").map((i) => i.trim())
+              : null,
+          });
+      core.info(`< ${status} ${Date.now() - time}ms`);
+    }
+  } catch (error) {
+    core.info(`Error: ${error}`);
   }
 
   core.info("Secret is saved");
