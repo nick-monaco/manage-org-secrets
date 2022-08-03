@@ -15592,48 +15592,54 @@ async function run() {
   }
 }
 
-async function getDependabotPublicKey(octokit, owner, repository) {
-  core.info("Requesting dependabot public key");
-  const time = Date.now();
-  const { status, data } = repository
-    ? await octokit.request(
-        "GET /repos/{owner}/{repo}/dependabot/secrets/public-key",
-        {
-          owner: owner,
-          repo: repository,
-        }
-      )
-    : await octokit.request("GET /orgs/{owner}/dependabot/secrets/public-key", {
-        owner: owner,
-      });
+// async function getDependabotPublicKey(octokit, owner, repository) {
+//   core.info("Requesting dependabot public key");
+//   const time = Date.now();
+//   const { status, data } = repository
+//     ? await octokit.request(
+//         "GET /repos/{owner}/{repo}/dependabot/secrets/public-key",
+//         {
+//           owner: owner,
+//           repo: repository,
+//         }
+//       )
+//     : await octokit.request("GET /orgs/{owner}/dependabot/secrets/public-key", {
+//         owner: owner,
+//       });
 
-  core.info(`< ${status} ${Date.now() - time}ms`);
-  return {
-    key: data.key,
-    keyId: data.key_id,
-  };
-}
+//   core.info(`< ${status} ${Date.now() - time}ms`);
+//   return {
+//     key: data.key,
+//     keyId: data.key_id,
+//   };
+// }
 
 async function getPublicKey(octokit, owner, repository) {
   core.info("Requesting public key");
   const time = Date.now();
-  const { status, data } = repository
-    ? await octokit.request(
-        "GET /repos/{owner}/{repo}/actions/secrets/public-key",
-        {
-          owner: owner,
-          repo: repository,
-        }
-      )
-    : await octokit.request("GET /orgs/{owner}/actions/secrets/public-key", {
-        owner: owner,
-      });
 
-  core.info(`< ${status} ${Date.now() - time}ms`);
-  return {
-    key: data.key,
-    keyId: data.key_id,
-  };
+  try {
+    const { status, data } = repository
+      ? await octokit.request(
+          "GET /repos/{owner}/{repo}/actions/secrets/public-key",
+          {
+            owner: owner,
+            repo: repository,
+          }
+        )
+      : await octokit.request("GET /orgs/{owner}/actions/secrets/public-key", {
+          owner: owner,
+        });
+
+    core.info(`< ${status} ${Date.now() - time}ms`);
+    return {
+      key: data.key,
+      keyId: data.key_id,
+    };
+  } catch (error) {
+    core.info(`Error: ${error}`);
+    throw error;
+  }
 }
 
 function encrypt(secret, value) {
@@ -15682,7 +15688,11 @@ async function handleSecret({
     //       });
     //   core.info(`< ${status} ${Date.now() - time}ms`);
     // } else {
-    const res = repository
+    core.info(`${owner}, ${secretName}`);
+    core.info(
+      selectedRepoIds ? selectedRepoIds.split(",").map((i) => i.trim()) : null
+    );
+    const { status, data } = repository
       ? await octokit.actions.createOrUpdateRepoSecret({
           owner: owner,
           repo: repository,
@@ -15698,11 +15708,12 @@ async function handleSecret({
             ? selectedRepoIds.split(",").map((i) => i.trim())
             : null,
         });
-    core.info(res);
-    core.info(`< ${res.status} ${Date.now() - time}ms`);
+    core.info(data);
+    core.info(`< ${status} ${Date.now() - time}ms`);
     // }
   } catch (error) {
     core.info(`Error: ${error}`);
+    throw error;
   }
 
   core.info("Secret is saved");
