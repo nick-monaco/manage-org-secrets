@@ -161,14 +161,14 @@ async function handleSecret({
       selectedRepoIds ? selectedRepoIds.split(",").map((i) => i.trim()) : null
     );
     const { status, data } = repository
-      ? await octokit.actions.createOrUpdateRepoSecret({
+      ? await octokit.rest.actions.createOrUpdateRepoSecret({
           owner: owner,
           repo: repository,
           secret_name: secretName,
           encrypted_value: encrypted,
           key_id: keyId,
         })
-      : await octokit.actions.createOrUpdateOrgSecret({
+      : await octokit.rest.actions.createOrUpdateOrgSecret({
           org: owner,
           secret_name: secretName,
           encrypted_value: encrypted,
