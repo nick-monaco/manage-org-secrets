@@ -24,63 +24,63 @@ async function run() {
     // Setup octokit
     const octokit = github.getOctokit(githubToken);
 
-    // if (isDependabotSecret) {
-    //   const { key, keyId } = await getDependabotPublicKey(
-    //     octokit,
-    //     owner,
-    //     repository
-    //   );
-    //   const encrypted = encrypt(key, secretValue);
-    //   await handleSecret({
-    //     octokit,
-    //     secretName,
-    //     encrypted,
-    //     owner,
-    //     repository,
-    //     keyId,
-    //     selectedRepoIds,
-    //     isDependabot: true,
-    //   });
-    // } else {
-    const { key, keyId } = await getPublicKey(octokit, owner, repository);
-    const encrypted = encrypt(key, secretValue);
-    await handleSecret({
-      octokit,
-      secretName,
-      encrypted,
-      owner,
-      repository,
-      keyId,
-      selectedRepoIds,
-      isDependabotSecret,
-    });
-    // }
+    if (isDependabotSecret) {
+      const { key, keyId } = await getDependabotPublicKey(
+        octokit,
+        owner,
+        repository
+      );
+      const encrypted = encrypt(key, secretValue);
+      await handleSecret({
+        octokit,
+        secretName,
+        encrypted,
+        owner,
+        repository,
+        keyId,
+        selectedRepoIds,
+        isDependabot: true,
+      });
+    } else {
+      const { key, keyId } = await getPublicKey(octokit, owner, repository);
+      const encrypted = encrypt(key, secretValue);
+      await handleSecret({
+        octokit,
+        secretName,
+        encrypted,
+        owner,
+        repository,
+        keyId,
+        selectedRepoIds,
+        isDependabotSecret,
+      });
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
-// async function getDependabotPublicKey(octokit, owner, repository) {
-//   core.info("Requesting dependabot public key");
-//   const time = Date.now();
-//   const { status, data } = repository
-//     ? await octokit.request(
-//         "GET /repos/{owner}/{repo}/dependabot/secrets/public-key",
-//         {
-//           owner: owner,
-//           repo: repository,
-//         }
-//       )
-//     : await octokit.request("GET /orgs/{owner}/dependabot/secrets/public-key", {
-//         owner: owner,
-//       });
+async function getDependabotPublicKey(octokit, owner, repository) {
+  core.info("Requesting dependabot public key");
+  const time = Date.now();
+  const { status, data } = repository
+    ? await octokit.request(
+        "GET /repos/{owner}/{repo}/dependabot/secrets/public-key",
+        {
+          owner: owner,
+          repo: repository,
+        }
+      )
+    : await octokit.request("GET /orgs/{owner}/dependabot/secrets/public-key", {
+        owner: owner,
+      });
 
-//   core.info(`< ${status} ${Date.now() - time}ms`);
-//   return {
-//     key: data.key,
-//     keyId: data.key_id,
-//   };
-// }
+  core.info(`< ${status} ${Date.now() - time}ms`);
+  return {
+    key: data.key,
+    keyId: data.key_id,
+  };
+}
 
 async function getPublicKey(octokit, owner, repository) {
   core.info("Requesting public key");
@@ -131,58 +131,51 @@ async function handleSecret({
   repository,
   keyId,
   selectedRepoIds,
-  isDependabot,
+  isDependabotSecret,
 }) {
   core.info("Updating secret");
   const time = Date.now();
 
   try {
-    // if (isDependabot) {
-    //   const { status } = repository
-    //     ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
-    //         owner: owner,
-    //         repo: repository,
-    //         secret_name: secretName,
-    //         encrypted_value: encrypted,
-    //         key_id: keyId,
-    //       })
-    //     : await octokit.rest.dependabot.createOrUpdateOrgSecret({
-    //         org: owner,
-    //         secret_name: secretName,
-    //         visibility: "selected",
-    //         selected_repository_ids: selectedRepoIds
-    //           ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
-    //           : null,
-    //       });
-    //   core.info(`< ${status} ${Date.now() - time}ms`);
-    // } else {
-    core.info(`${owner}, ${secretName}`);
-    core.info(
-      selectedRepoIds
-        ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
-        : null
-    );
-    const { status, data } = repository
-      ? await octokit.rest.actions.createOrUpdateRepoSecret({
-          owner: owner,
-          repo: repository,
-          secret_name: secretName,
-          encrypted_value: encrypted,
-          key_id: keyId,
-        })
-      : await octokit.rest.actions.createOrUpdateOrgSecret({
-          org: owner,
-          secret_name: secretName,
-          encrypted_value: encrypted,
-          key_id: keyId,
-          visibility: "selected",
-          selected_repository_ids: selectedRepoIds
-            ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
-            : null,
-        });
-    core.info(data);
-    core.info(`< ${status} ${Date.now() - time}ms`);
-    // }
+    if (isDependabotSecret) {
+      const { status } = repository
+        ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
+            owner: owner,
+            repo: repository,
+            secret_name: secretName,
+            encrypted_value: encrypted,
+            key_id: keyId,
+          })
+        : await octokit.rest.dependabot.createOrUpdateOrgSecret({
+            org: owner,
+            secret_name: secretName,
+            visibility: "selected",
+            selected_repository_ids: selectedRepoIds
+              ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+              : null,
+          });
+      core.info(`< ${status} ${Date.now() - time}ms`);
+    } else {
+      const { status } = repository
+        ? await octokit.rest.actions.createOrUpdateRepoSecret({
+            owner: owner,
+            repo: repository,
+            secret_name: secretName,
+            encrypted_value: encrypted,
+            key_id: keyId,
+          })
+        : await octokit.rest.actions.createOrUpdateOrgSecret({
+            org: owner,
+            secret_name: secretName,
+            encrypted_value: encrypted,
+            key_id: keyId,
+            visibility: "selected",
+            selected_repository_ids: selectedRepoIds
+              ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+              : null,
+          });
+      core.info(`< ${status} ${Date.now() - time}ms`);
+    }
   } catch (error) {
     core.info(`Error: ${error}`);
     throw error;
