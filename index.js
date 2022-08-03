@@ -52,7 +52,7 @@ async function run() {
       repository,
       keyId,
       selectedRepoIds,
-      isDependabot,
+      isDependabotSecret,
     });
     // }
   } catch (error) {
