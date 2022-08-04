@@ -24,37 +24,38 @@ async function run() {
     // Setup octokit
     const octokit = github.getOctokit(githubToken);
 
-    if (!!isDependabotSecret) {
-      const { key, keyId } = await getDependabotPublicKey(
-        octokit,
-        owner,
-        repository
-      );
-      const encrypted = encrypt(key, secretValue);
-      await handleSecret({
-        octokit,
-        secretName,
-        encrypted,
-        owner,
-        repository,
-        keyId,
-        selectedRepoIds,
-        isDependabot: true,
-      });
-    } else {
-      const { key, keyId } = await getPublicKey(octokit, owner, repository);
-      const encrypted = encrypt(key, secretValue);
-      await handleSecret({
-        octokit,
-        secretName,
-        encrypted,
-        owner,
-        repository,
-        keyId,
-        selectedRepoIds,
-        isDependabotSecret,
-      });
-    }
+    core.info(`is dependapot secret ${!!isDependabotSecret}`);
+    // if (!!isDependabotSecret) {
+    //   const { key, keyId } = await getDependabotPublicKey(
+    //     octokit,
+    //     owner,
+    //     repository
+    //   );
+    //   const encrypted = encrypt(key, secretValue);
+    //   await handleSecret({
+    //     octokit,
+    //     secretName,
+    //     encrypted,
+    //     owner,
+    //     repository,
+    //     keyId,
+    //     selectedRepoIds,
+    //     isDependabot: true,
+    //   });
+    // } else {
+    const { key, keyId } = await getPublicKey(octokit, owner, repository);
+    const encrypted = encrypt(key, secretValue);
+    await handleSecret({
+      octokit,
+      secretName,
+      encrypted,
+      owner,
+      repository,
+      keyId,
+      selectedRepoIds,
+      isDependabotSecret,
+    });
+    // }
   } catch (error) {
     core.setFailed(error.message);
   }
