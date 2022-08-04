@@ -15680,6 +15680,7 @@ async function handleSecret({
         : await octokit.rest.dependabot.createOrUpdateOrgSecret({
             org: owner,
             secret_name: secretName,
+            encrypted_value: encrypted,
             key_id: keyId,
             visibility: "selected",
             selected_repository_ids: selectedRepoIds
