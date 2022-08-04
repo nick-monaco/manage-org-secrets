@@ -15556,7 +15556,7 @@ async function run() {
     // Setup octokit
     const octokit = github.getOctokit(githubToken);
 
-    core.info(`is dependapot secret ${!!isDependabotSecret}`);
+    core.info(`is dependapot secret ${Boolean(isDependabotSecret)}`);
     // if (!!isDependabotSecret) {
     //   const { key, keyId } = await getDependabotPublicKey(
     //     octokit,
@@ -15669,46 +15669,46 @@ async function handleSecret({
   const time = Date.now();
 
   try {
-    if (!!isDependabotSecret) {
-      const { status } = repository
-        ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
-            owner: owner,
-            repo: repository,
-            secret_name: secretName,
-            encrypted_value: encrypted,
-            key_id: keyId,
-          })
-        : await octokit.rest.dependabot.createOrUpdateOrgSecret({
-            org: owner,
-            secret_name: secretName,
-            key_id: keyId,
-            visibility: "selected",
-            selected_repository_ids: selectedRepoIds
-              ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
-              : null,
-          });
-      core.info(`< ${status} ${Date.now() - time}ms`);
-    } else {
-      const { status } = repository
-        ? await octokit.rest.actions.createOrUpdateRepoSecret({
-            owner: owner,
-            repo: repository,
-            secret_name: secretName,
-            encrypted_value: encrypted,
-            key_id: keyId,
-          })
-        : await octokit.rest.actions.createOrUpdateOrgSecret({
-            org: owner,
-            secret_name: secretName,
-            encrypted_value: encrypted,
-            key_id: keyId,
-            visibility: "selected",
-            selected_repository_ids: selectedRepoIds
-              ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
-              : null,
-          });
-      core.info(`< ${status} ${Date.now() - time}ms`);
-    }
+    // if (!!isDependabotSecret) {
+    //   const { status } = repository
+    //     ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
+    //         owner: owner,
+    //         repo: repository,
+    //         secret_name: secretName,
+    //         encrypted_value: encrypted,
+    //         key_id: keyId,
+    //       })
+    //     : await octokit.rest.dependabot.createOrUpdateOrgSecret({
+    //         org: owner,
+    //         secret_name: secretName,
+    //         key_id: keyId,
+    //         visibility: "selected",
+    //         selected_repository_ids: selectedRepoIds
+    //           ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+    //           : null,
+    //       });
+    //   core.info(`< ${status} ${Date.now() - time}ms`);
+    // } else {
+    const { status } = repository
+      ? await octokit.rest.actions.createOrUpdateRepoSecret({
+          owner: owner,
+          repo: repository,
+          secret_name: secretName,
+          encrypted_value: encrypted,
+          key_id: keyId,
+        })
+      : await octokit.rest.actions.createOrUpdateOrgSecret({
+          org: owner,
+          secret_name: secretName,
+          encrypted_value: encrypted,
+          key_id: keyId,
+          visibility: "selected",
+          selected_repository_ids: selectedRepoIds
+            ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+            : null,
+        });
+    core.info(`< ${status} ${Date.now() - time}ms`);
+    // }
   } catch (error) {
     throw error;
   }
