@@ -24,7 +24,7 @@ async function run() {
     // Setup octokit
     const octokit = github.getOctokit(githubToken);
 
-    if (isDependabotSecret) {
+    if (!!isDependabotSecret) {
       const { key, keyId } = await getDependabotPublicKey(
         octokit,
         owner,
@@ -136,7 +136,7 @@ async function handleSecret({
   const time = Date.now();
 
   try {
-    if (isDependabotSecret) {
+    if (!!isDependabotSecret) {
       const { status } = repository
         ? await octokit.rest.dependabot.createOrUpdateRepoSecret({
             owner: owner,
