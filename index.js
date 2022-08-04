@@ -105,7 +105,6 @@ async function getPublicKey(octokit, owner, repository) {
       keyId: data.key_id,
     };
   } catch (error) {
-    core.info(`Error: ${error}`);
     throw error;
   }
 }
@@ -149,6 +148,7 @@ async function handleSecret({
         : await octokit.rest.dependabot.createOrUpdateOrgSecret({
             org: owner,
             secret_name: secretName,
+            key_id: keyId,
             visibility: "selected",
             selected_repository_ids: selectedRepoIds
               ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
@@ -177,7 +177,6 @@ async function handleSecret({
       core.info(`< ${status} ${Date.now() - time}ms`);
     }
   } catch (error) {
-    core.info(`Error: ${error}`);
     throw error;
   }
 
