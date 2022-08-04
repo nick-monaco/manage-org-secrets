@@ -15571,7 +15571,7 @@ async function run() {
         repository,
         keyId,
         selectedRepoIds,
-        isDependabot: true,
+        isDependabotSecret,
       });
     } else {
       const { key, keyId } = await getPublicKey(octokit, owner, repository);
