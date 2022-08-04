@@ -25,6 +25,8 @@ async function run() {
     const octokit = github.getOctokit(githubToken);
 
     core.info(`is dependapot secret ${Boolean(isDependabotSecret)}`);
+    core.info(`is dependapot secret ${isDependabotSecret === "false"}`);
+    core.info(`is dependapot secret ${isDependabotSecret == false}`);
     // if (!!isDependabotSecret) {
     //   const { key, keyId } = await getDependabotPublicKey(
     //     octokit,
