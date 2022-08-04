@@ -152,7 +152,7 @@ async function handleSecret({
             key_id: keyId,
             visibility: "selected",
             selected_repository_ids: selectedRepoIds
-              ? selectedRepoIds.split(",").map((i) => Number(i.trim()))
+              ? selectedRepoIds.split(",").map((i) => i.trim())
               : null,
           });
       core.info(`< ${status} ${Date.now() - time}ms`);
